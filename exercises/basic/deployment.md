@@ -757,3 +757,82 @@
     </p>
     </details>
 
+17. Create yaml for a statefulset with name `nginx` in deafult namespace. Use image `k8s.gcr.io/nginx-slim:0.8`. Label the statefulset with `app=nginx-sts`. It should run 3 replicas. Configure the container name as `nginx-sts` and it should  not take than 5s if the statefulset pod is terminated. Use PVCs for sts and mount them at `/usr/share/nginx/html`. Use the `default` storage class to create the pvcs for the statefulset. Check the statefulset yaml and deploy it. Verify the sts, pod and PVCs created and their mappings.
+
+    <details><summary>steps</summary>
+    Prepare yaml for statefulset.
+    <p>
+
+    ```text
+    apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      name: nginx
+    spec:
+      selector:
+        matchLabels:
+          app: nginx-sts
+      serviceName: "nginx"
+      replicas: 3 # by default is 1
+      template:
+        metadata:
+          labels:
+            app: nginx-sts
+        spec:
+          terminationGracePeriodSeconds: 5
+          containers:
+          - name: nginx-sts
+            image: k8s.gcr.io/nginx-slim:0.8
+            volumeMounts:
+            - name: www
+              mountPath: /usr/share/nginx/html
+      volumeClaimTemplates:
+      - metadata:
+          name: www
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 200Mi
+    ```
+    </p>
+
+    deploy statefulset.
+
+    <p>
+
+    ```bash
+    kubectl apply -f nginx-sts.yaml
+    ```
+    </p>
+
+    Check the statefulset, pods and PVCs.
+    <p>
+
+    ```bash
+    kubectl get statefulset,po,pvc
+    ```
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    <p>
+
+    ```text
+    kubectl get statefulset,po,pvc -o wide
+    NAME                     READY   AGE     CONTAINERS   IMAGES
+    statefulset.apps/nginx   3/3     5m11s   nginx-sts    k8s.gcr.io/nginx-slim:0.8
+
+    NAME                         READY   STATUS             RESTARTS          AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+    pod/nginx-0                  1/1     Running            0                 5m11s   172.17.0.27   minikube   <none>           <none>
+    pod/nginx-1                  1/1     Running            0                 5m9s    172.17.0.28   minikube   <none>           <none>
+    pod/nginx-2                  1/1     Running            0                 5m8s    172.17.0.31   minikube   <none>           <none>
+
+    NAME                                STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+    persistentvolumeclaim/www-nginx-0   Bound    pvc-2b120e12-53e6-40b4-bb5b-6bb5c1aa0698   200Mi      RWO            standard       2m59s
+    persistentvolumeclaim/www-nginx-1   Bound    pvc-a34cf366-061c-4ef3-932f-ea2274d9154e   200Mi      RWO            standard       2m56s
+    persistentvolumeclaim/www-nginx-2   Bound    pvc-29417f58-6048-457a-a30f-ae3194be4e39   200Mi      RWO            standard       2m53s
+
+    ```
+    </p>
+    </details>
