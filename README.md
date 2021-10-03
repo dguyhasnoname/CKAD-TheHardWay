@@ -10,10 +10,59 @@ CKAD Curriculum: [link](https://github.com/cncf/curriculum)
 ## Contents:
 
 1. Application desgin and build - 20%
+    <details><summary>details</summary>
+    <p>
+
+    - Define, build and modify container images 
+    - Understand Jobs and CronJobs 
+    - Understand multi-container Pod design patterns (e.g. sidecar, init and others) 
+    - Utilize persistent and ephemeral volumes 
+
+    </p>
+    </details>
 2. Application deployment - 20%
+    <details><summary>details</summary>
+    <p>
+
+    - Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary) 
+    - Understand Deployments and how to perform rolling updates 
+    - Use the Helm package manager to deploy existing packages 
+    </p>
+    </details>
 3. Application observability and maintenance - 15%
+    <details><summary>details</summary>
+    <p>
+
+    - Understand API deprecations 
+    - Implement probes and health checks 
+    - Use provided tools to monitor Kubernetes applications 
+    - Utilize container logs 
+    - Debugging in Kubernetes 
+    </p>
 4. Application Environment, Configuration and Security - 25%
+    <details><summary>details</summary>
+    <p>
+
+    - Discover and use resources that extend Kubernetes (CRD)
+    - Understand authentication, authorization and admission control
+    - Understanding and defining resource requirements, limits and quotas
+    - Understand ConfigMaps
+    - Create & consume Secrets
+    - Understand ServiceAccounts
+    - Understand SecurityContexts
+
+    </p>
 5. Services and Networking - 20%
+
+    <details><summary>details</summary>
+    <p>
+
+    - Demonstrate basic understanding of NetworkPolicies
+    - Provide and troubleshoot access to applications via services
+    - Use Ingress rules to expose applications
+
+    </p>
+
 
 ## Lab setup
 
@@ -52,7 +101,7 @@ Running above command should setup the lab in your cluster.
         ```
 
         Since this is going to save time in indentation and help create error free yamls, here is a tip to remember the setting:
-        - remember set TES
+        - remember TES(reverse of set)
             - T for tabstop
             - E for expandtab
             - S for shiftwidth
@@ -63,6 +112,33 @@ Running above command should setup the lab in your cluster.
         3. To indent press `>`(shift + .).
 
         You can then repeat the indentation by using the `>` key. This can be useful when we copy yamls from kuberntes documentations.
+    - Other vim shortcuts:
+
+        ```text
+        w : jump to the next word
+        W : jump to the previous word
+        e : jump to the end of the current word
+        E : jump to the beginning of the next word
+        $ : jump to the end of the current line
+        0 : jump to the beginning of the current line
+        ^ : jump to the beginning of the previous line
+
+        G : end of the file
+        g : beginning of the file
+
+        dG : delete till the end of the file
+        d0 : delete till the beginning of the file
+        4dd : delete the next 4 lines
+        d: delete the current line
+        D: delete till end of line
+        dw: delete the current word
+
+        f + <char> : jump to the next occurrence of <char>
+        F + <char> : jump to the previous occurrence of <char>
+
+        yy: copy the current line
+        3yy: copy the next 3 lines
+        ```
 
 2. Setup your aliases
 
