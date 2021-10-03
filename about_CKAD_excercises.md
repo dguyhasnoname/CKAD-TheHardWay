@@ -2,7 +2,7 @@
 
 CKAD excercises in this repo are of two different difficulty levels:
 
-1. basic
+1. [basic](excercises/basic)
 2. advanced
 
 CKAD Curriculum: [link](https://github.com/cncf/curriculum)
