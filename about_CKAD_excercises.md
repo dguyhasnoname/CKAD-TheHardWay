@@ -1,4 +1,4 @@
-# CKAD excerises [under development]
+# CKAD-TheHardWay [under development]
 
 CKAD excercises in this repo are of two different difficulty levels:
 
@@ -6,6 +6,14 @@ CKAD excercises in this repo are of two different difficulty levels:
 2. advanced
 
 CKAD Curriculum: [link](https://github.com/cncf/curriculum)
+
+## Contents:
+
+1. Application desgin and build - 20%
+2. Application deployment - 20%
+3. Application observability and maintenance - 15%
+4. Application Environment, Configuration and Security - 25%
+5. Services and Networking - 20%
 
 ## Lab setup
 
@@ -18,6 +26,7 @@ CKAD Curriculum: [link](https://github.com/cncf/curriculum)
 2. kubectl & helm
 
     Install CLI kubectl: [steps](https://kubernetes.io/docs/tasks/tools/#kubectl)
+
     Install helm: [steps](https://helm.sh/docs/intro/install/)
 
 3. kubeconfig of your k8s cluster
@@ -58,3 +67,13 @@ Running above command should setup the lab in your cluster.
     alias 'krna=kubectl run na --rm -it --image=nginx:alpine --restart=Never'
     alias 'kn=kubectl config set-context --current --namespace'
     ```
+
+    You can find more aliases in [kubectl](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+
+## PRs
+
+Feel free to PR and edit/add questions and solutions, but please floow to the existing format and make sure you have tested your changes before submitting a PR.
+
+If CKAD-TheHardWay repo has helped you in any way learning Kubernetes, feel free to post on discussions, share across your blogs or buy me a coffee!
+
+<a href="https://buymeacoffee.com/dguyhasnoname" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
