@@ -836,3 +836,159 @@
     ```
     </p>
     </details>
+
+18. Create a deployment with name `nginx-deployment` in `denver` namespace. Use image `nginx:1.14.2` with container name as `nginx-deployment`. Label the deployment with `app=nginx-deployment`. It should run 3 replicas. The deployment should also run another container with image busybox and command `sleep 3600`. Once the pods for the deployment are up, update the image to `nginx:1.16.1` from`nginx:1.14.2`. and verify the pods are updated and see the rollout status. Once the pods are updated, rollback the image to previous version and ensure pod are runnig fine after rollback and no more accidental rollout happens.
+
+    <details><summary>steps</summary>
+    Create initial deployment yaml and store in nginx-deployment.yaml.
+    <p>
+
+    ```bash
+    kubectl create deploy nginx-deployment -n denver --image=nginx:1.14.2 --replicas=3 --dry-run=client -o yaml
+    ```
+    </p>
+    Edit the deployment yaml to add another container.
+
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-deployment
+      name: nginx-deployment
+      namespace: denver
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: nginx-deployment
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: nginx-deployment
+        spec:
+          containers:
+          - image: busybox
+            name: busybox
+            command: ["/bin/sh", "-c", "sleep 3600"]
+          - image: nginx:1.14.2
+            name: nginx-deployment
+            resources: {}
+    status: {}
+    ```
+    </p>
+    Apply the deployment yaml.
+
+    <p>
+
+    ```bash
+    kubectl apply -f nginx-deployment.yaml
+    ```
+    </p>
+    Update the image to nginx:1.16.1.
+    <p>
+
+    ```bash
+    kubectl set image deploy nginx-deployment nginx-deployment=nginx:1.16.2 -n denver
+    ```
+    </p>
+    Verify the pods are updated and see the rollout status.
+    <p>
+
+    ```bash
+    kubectl rollout status deploy nginx-deployment -n denver
+    ```
+    </p>
+    Rollback the image to nginx:1.14.2.
+    <p>
+
+    ```bash
+    kubectl rollout undo nginx-deployment -n denver --to-revision=1
+    ```
+    </p>
+    Pause the rollout to avoid any further release.
+    <p>
+
+    ```bash
+    kubectl rollout pause nginx-deployment -n denver
+    ```
+    </p>
+    </details>
+
+    <details><summary>result</summary>
+    Verify that deployment pods are running fine.
+    <p>
+
+    ```text
+    ┗━ ॐ  kubectl get po -n denver -l app=nginx-deployment
+    NAME                                READY   STATUS      RESTARTS   AGE
+    nginx-deployment-6774947b7d-cprzd   2/2     Running     0          36s
+    nginx-deployment-6774947b7d-g9wfm   2/2     Running     0          59s
+    nginx-deployment-6774947b7d-v4zzm   2/2     Running     0          80s
+    ```
+    </p>
+
+    Verify that the image is updated.
+    <p>
+
+    ```bash
+    kubectl get po -n denver -l app=nginx-deployment -o jsonpath='{.items[*].spec.containers[?(@.name=="nginx-deployment")].image}'
+    ```
+    </p>
+    Verify if the rollout is paused. Try updating a new image and see if changes gets rolled out.
+    <p>
+
+    ```bash
+    [05:49 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ  kubectl set image deploy nginx-deployment nginx-deployment=nginx:1.16.4 -n denver
+    deployment.apps/nginx-deployment image updated
+    [05:49 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ  kubectl rollout status deploy nginx-deployment -n denver
+    Waiting for deployment "nginx-deployment" rollout to finish: 0 out of 3 new replicas have been updated...
+    ```
+    </p>
+    If you check the rollout will not happen and old pods will keep running. We may have to resume the rollout to see the changes.
+    </details>
+
+19. Update the image to nginx:1.21.3. Resume the rollout so that new image changes can be propagated.
+
+    <details><summary>steps</summary>
+    <p>
+
+    ```bash
+    kubectl set image deploy nginx-deployment nginx-deployment=nginx:1.21.3 -n denver
+    ```
+    </p>
+    Resume the rollout.
+    <p>
+
+    ```bash
+    kubectl rollout resume nginx-deployment -n denver
+    ```
+    </p>
+    </details>
+
+    <details><summary>result</summary>
+    <p>
+
+    ```bash
+    [05:55 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ  kubectl rollout resume deploy nginx-deployment -n denver
+    deployment.apps/nginx-deployment resumed
+    ```
+    </p>
+
+    Verify that the pods are updated.
+    <p>
+
+    ```bash
+    [06:00 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ      kubectl get po -n denver -l app=nginx-deployment -o jsonpath='{.items[*].spec.containers[?(@.name=="nginx-deployment")].image}'
+    nginx:1.21.3 nginx:1.21.3 nginx:1.21.3
+    ```
+    </details>
