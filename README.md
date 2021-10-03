@@ -41,34 +41,53 @@ Running above command should setup the lab in your cluster.
 
 ## Tips and tricks
 
-1. Tune your vim editor
+1. Tune your vim editor skills
 
-    ```
-    set tabstop=2
-    set expandtab
-    set shiftwidth=2
-    ```
+    - Create the file ~/.vimrc with the following content:
+
+        ```
+        set tabstop=2       # tab width to 2 spaces
+        set expandtab       # expand tabs to spaces
+        set shiftwidth=2:   # columns of whitespace for indentation
+        ```
+
+        Since this is going to save time in indentation and help create error free yamls, here is a tip to remember the setting:
+        - remember set TES
+            - T for tabstop
+            - E for expandtab
+            - S for shiftwidth
+
+    - Multiple lines indentation:
+        1. Press `V` to enter VISUAL LINE mode.
+        2. Select the text you wish to indent but using either the cursor keys or the `j` and `k` keys.
+        3. To indent press `>`(shift + .).
+
+        You can then repeat the indentation by using the `>` key. This can be useful when we copy yamls from kuberntes documentations.
 
 2. Setup your aliases
 
     ```bash
     alias 'kg=kubectl get'
     alias 'kd=kubectl describe'
-    alias 'kc=kubectl create'
-    alias 'kr=kubectl run'
-    alias 'ka=kubectl apply'
-    alias 'kdel=kubectl delete --force --grace-period=0'
+    alias 'kc=kubectl create'                                               # useful for creating deployments/services
+    alias 'kr=kubectl run'                                                  # useful for creating pods
+    alias 'ka=kubectl apply'                                                # used for creating resources by files
+    alias 'kdel=kubectl delete --force --grace-period=0'                    # used for deleting resources quickly
     alias 'kl=kubectl logs'
     alias 'kgy=kubectl get -o yaml'
-    alias 'kcd=kubectl --dry-run=client -o yaml create'
-    alias 'krd=kubectl --dry-run=client -o yaml run'
-    alias 'ked=kubectl --dry-run=client -o yaml expose'
-    alias 'krbb=kubectl run bb --rm -it --image=busybox --restart=Never'
-    alias 'krna=kubectl run na --rm -it --image=nginx:alpine --restart=Never'
-    alias 'kn=kubectl config set-context --current --namespace'
+    alias 'kcd=kubectl --dry-run=client -o yaml create'                     # used for creating resources yaml
+    alias 'krd=kubectl --dry-run=client -o yaml run'                        # used for creating pods yaml
+    alias 'ked=kubectl --dry-run=client -o yaml expose'                     # used for creating services yaml
+    alias 'krb=kubectl run bb --rm -it --image=busybox --restart=Never'     # used for creating pod with busybox
+    alias 'krc=kubectl run na --rm -it --image=nginx:alpine --restart=Never'# used for creating pod for curl
+    alias 'kn=kubectl config set-context --current --namespace'             # used for setting namespace
     ```
 
-    You can find more aliases in [kubectl](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+    These aliases can help to save lot of time, especially the `-dry-run=client -o yaml`. You can find more aliases in [kubectl](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+
+    You can also use `kubectl completion` to get the completion for kubectl.
+
+3. Try to use imperative kubectl commands to create resources yaml. You can use `kubectl get` to get the list of resources.
 
 ## PRs
 

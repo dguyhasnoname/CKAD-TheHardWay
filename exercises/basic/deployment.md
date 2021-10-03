@@ -1,4 +1,4 @@
-# Application deployment
+# Application deployment - 20%
 
 1. Create a namespace with name `denver`
 
