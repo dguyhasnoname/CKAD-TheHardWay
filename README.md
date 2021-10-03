@@ -72,7 +72,7 @@ Running above command should setup the lab in your cluster.
 
 ## PRs
 
-Feel free to PR and edit/add questions and solutions, but please floow to the existing format and make sure you have tested your changes before submitting a PR.
+Feel free to PR and edit/add questions and solutions, but please follow to the existing format and make sure you have tested your changes before submitting a PR.
 
 If CKAD-TheHardWay repo has helped you in any way learning Kubernetes, feel free to post on discussions, share across your blogs or buy me a coffee!
 
