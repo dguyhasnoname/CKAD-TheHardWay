@@ -955,7 +955,7 @@
     If you check the rollout will not happen and old pods will keep running. We may have to resume the rollout to see the changes.
     </details>
 
-19. Update the image to nginx:1.21.3. Resume the rollout so that new image changes can be propagated.
+19. Update the image to nginx:1.21.3 in deployment `nginx-deployment`(created in question 18). Resume the rollout so that new image changes can be propagated.
 
     <details><summary>steps</summary>
     <p>
