@@ -299,13 +299,13 @@
     </p>
     </details>
 
-9. Generate yaml for a deployment named `running` in namespace `excersie` that uses image `alpine:latest` and replicas 2. The deployment should have a label `app=running-daily`. The container should have a command `echo "Hello from running"`. The name of container should be `running-daily`. Do not run the deployment.
+9. Generate yaml for a deployment named `running` in namespace `exercise` that uses image `alpine:latest` and replicas 2. The deployment should have a label `app=running-daily`. The container should have a command `echo "Hello from running"`. The name of container should be `running-daily`. Do not run the deployment.
 
     <details><summary>steps</summary>
     <p>
 
     ```bash
-    kubectl create ns excersie
+    kubectl create ns exercise
     ```
     <p>
 
@@ -350,7 +350,7 @@
     ```
     </details>
 
-10. Convert the pod `game` to deployment `game` in namespace `denver`. Use same image, container name as `game` and number to replicas should be 2.
+10. Convert the pod `game`(deployed in question 4) to deployment `game` in namespace `denver`. Use same image, container name as `game` and number to replicas should be 2.
 
     <details><summary>steps</summary>
     <p>
@@ -424,7 +424,7 @@
     </p>
     </details>
 
-11. Scale the deployment `game` to 3 replicas.
+11. Scale the deployment `game`(deployment created in question 10) to 3 replicas.
 
     <details><summary>steps</summary>
     <p>
@@ -757,7 +757,7 @@
     </p>
     </details>
 
-17. Create yaml for a statefulset with name `nginx` in deafult namespace. Use image `k8s.gcr.io/nginx-slim:0.8`. Label the statefulset with `app=nginx-sts`. It should run 3 replicas. Configure the container name as `nginx-sts` and it should  not take than 5s if the statefulset pod is terminated. Use PVCs for sts and mount them at `/usr/share/nginx/html`. Use the `default` storage class to create the pvcs for the statefulset. Check the statefulset yaml and deploy it. Verify the sts, pod and PVCs created and their mappings.
+17. Create yaml for a statefulset with name `nginx` in deafult namespace. Use image `k8s.gcr.io/nginx-slim:0.8`. Label the statefulset with `app=nginx-sts`. It should run 3 replicas. Configure the container name as `nginx-sts` and it should  not take than 5s if the statefulset pod is terminated. Use PVCs for sts in `RWO` accessMode and mount them at `/usr/share/nginx/html` in statefulset pods. Use the `default` storage class to create the pvcs for the statefulset. Check the statefulset yaml and deploy it. Verify the sts, pod and PVCs created and their mappings.
 
     <details><summary>steps</summary>
     Prepare yaml for statefulset.
