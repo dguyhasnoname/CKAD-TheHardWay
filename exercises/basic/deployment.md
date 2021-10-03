@@ -757,7 +757,7 @@
     </p>
     </details>
 
-17. Create yaml for a statefulset with name `nginx` in deafult namespace. Use image `k8s.gcr.io/nginx-slim:0.8`. Label the statefulset with `app=nginx-sts`. It should run 3 replicas. Configure the container name as `nginx-sts` and it should  not take than 5s if the statefulset pod is terminated. Use PVCs for sts in `RWO` accessMode and mount them at `/usr/share/nginx/html` in statefulset pods. Use the `default` storage class to create the pvcs for the statefulset. Check the statefulset yaml and deploy it. Verify the sts, pod and PVCs created and their mappings.
+17. Create yaml for a statefulset with name `nginx` in deafult namespace. Use image `k8s.gcr.io/nginx-slim:0.8`. Label the statefulset with `app=nginx-sts`. It should run 3 replicas. Configure the container name as `nginx-sts` and it should not take more than 5s to shutdown the pod if the statefulset pod is terminated. Use PVCs for sts in `RWO` accessMode and mount them at `/usr/share/nginx/html` in statefulset pods. Use the `default` storage class to create the pvcs for the statefulset. Check the statefulset yaml and deploy it. Verify the sts, pod and PVCs created and their mappings.
 
     <details><summary>steps</summary>
     Prepare yaml for statefulset.
