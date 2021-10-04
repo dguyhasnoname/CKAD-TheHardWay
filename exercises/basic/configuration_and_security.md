@@ -534,7 +534,7 @@
     <p>
 
     ```json
-    ┗━ ॐ  kubectl po -n denver -o json security-context-demo | jq '.spec.containers[]'
+    ┗━ ॐ  kubectl get po -n denver -o json security-context-demo | jq '.spec.containers[]'
     {
       "command": [
         "sh",
@@ -660,7 +660,7 @@
     <p>
 
     ```json
-    ┗━ ॐ  kubectl po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
+    ┗━ ॐ  kubectl get po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
     {
       "image": "nginx:1.7.9",
       "imagePullPolicy": "IfNotPresent",
