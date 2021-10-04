@@ -988,3 +988,185 @@
     nginx:1.21.3 nginx:1.21.3 nginx:1.21.3
     ```
     </details>
+
+20. Team Mumbai wants to setup stateful MySQL db in namespace `mumbai`. Create a statefulset `mysql` in `mumbai` namespace with image `mysql:5.6`. Store the password of mysql in secret `mysql-secret` and pass it to container with name `MYSQL_ROOT_PASSWORD` as an environment variable. Run the MySQL instance on port `3306`. Mount a PVC named `mysql-pv-claim` in the `mysql` container at path `/var/lib/mysql`. The PVC should be binded to a PV named `mysql-pv-volume` with storageClass as `manual`. The PV & PVC should have `ReadWriteOnce` access mode. The PVC should request for `1Gi` storage. The PV capacity should be `3Gi`. Expose the `mysql` deployment on port `3306` using a headless service.
+
+    <details><summary>steps</summary>
+    <p>
+
+    ```bash
+    kubectl create ns mumbai
+    ```
+    </p>
+    Create the storageClass, PV and PVC using storage.yaml.
+    <p>
+
+    ```yaml
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: manual
+    provisioner: k8s.io/minikube-hostpath # this is for minikube clusters. Use appropriate provisioner if working on other clusters.
+    reclaimPolicy: Retain
+    allowVolumeExpansion: true
+    ---
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: mysql-pv-volume
+      labels:
+        type: local
+    spec:
+      storageClassName: manual
+      capacity:
+        storage: 3Gi
+      accessModes:
+        - ReadWriteOnce
+      hostPath:
+        path: "/mnt/data"
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mysql-pv-claim
+      namespace: mumbai
+    spec:
+      storageClassName: manual
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+    ```
+    </p>
+    Generate the basic mysql deployment  yaml.
+    <p>
+
+    ```bash
+    kubectl create deploy mysql -n mumbai --image=mysql:5.6 --port=3306 --dry-run=client -o yaml > mysql-deploy.yaml
+    ```
+    </p>
+    Edit the deployment yaml.
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: mysql
+      namespace: mumbai
+    spec:
+      selector:
+        matchLabels:
+          app: mysql
+      template:
+        metadata:
+          labels:
+            app: mysql
+        spec:
+          containers:
+          - image: mysql:5.6
+            name: mysql
+            env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            ports:
+            - containerPort: 3306
+              name: mysql
+            volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+          volumes:
+          - name: mysql-persistent-storage
+            persistentVolumeClaim:
+              claimName: mysql-pv-claim
+    ```
+    </p>
+    Create the secret mysql-secret.
+    <p>
+
+    ```bash
+    kubectl create secret generic mysql-secret --from-literal=MYSQL_ROOT_PASSWORD=password -n mumbai
+    ```
+    </p>
+    Create the service `mysql-service` by below data in mysql-service.yaml.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: mysql
+      namespace: mumbai
+    spec:
+      ports:
+      - port: 3306
+      selector:
+        app: mysql
+      clusterIP: None
+    ```
+    </p>
+    Apply the deployment, storage and service yaml.
+
+    <p>
+
+    ```bash
+    kubectl apply -f storage.yaml
+    kubectl apply -f mysql-deploy.yaml
+    kubectl apply -f mysql-service.yaml
+    ```
+    </p>
+    </details>
+
+    <details><summary>result</summary>
+    Check if storage is created.
+    <p>
+
+    ```bash
+    [11:09 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 CKAD-TheHardWay ❱ master ▲] 
+    ┗━ ॐ  kg sc,pv,pvc
+    NAME                                             PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+    storageclass.storage.k8s.io/manual               k8s.io/minikube-hostpath   Retain          Immediate           true                   6s
+    storageclass.storage.k8s.io/standard (default)   k8s.io/minikube-hostpath   Delete          Immediate           false                  28h
+
+    NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                   STORAGECLASS   REASON   AGE
+    persistentvolume/mysql-pv-volume                            3Gi        RWO            Retain           Bound       mumbai/mysql-pv-claim   manual                  6s
+    persistentvolume/pvc-ebf0372d-f5c4-4446-b023-175d22ee1ab1   1Gi        RWO            Retain           Available   mumbai/mysql-pv-claim   manual                  6s
+    ```
+    </p>
+    Check if mysql pod in up and mysql service is up inside the pod.
+    <p>
+
+    ```text
+    ┗━ ॐ  kg po,svc,secret -n mumbai
+    NAME                         READY   STATUS    RESTARTS   AGE
+    pod/mysql-756f767845-tsrqq   1/1     Running   0          8m10s
+    pod/mysql-client             0/1     Error     0          50s
+
+    NAME            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+    service/mysql   ClusterIP   None         <none>        3306/TCP   6m51s
+
+    NAME                         TYPE                                  DATA   AGE
+    secret/default-token-55rs4   kubernetes.io/service-account-token   3      11m
+    secret/mysql-secret          Opaque                                1      7m43s
+    ```
+    </p>
+    Check if mysql is accessible using the headless service.
+    <p>
+
+    ```bash
+    [11:15 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ  kubectl run -n mumbai -it --rm --image=mysql:5.6 --restart=Never mysql-client -- mysql -h mysql -ppassword
+    If you don't see a command prompt, try pressing enter.
+
+    mysql>
+    mysql>
+    mysql> exit
+    Bye
+    ```
+    </p>
+
+    </details>
