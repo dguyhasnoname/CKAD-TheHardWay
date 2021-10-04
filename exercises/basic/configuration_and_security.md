@@ -306,6 +306,7 @@
     kubectl run redis --dry-run=client -o yaml -n redis --image=redis:5.0.4 --port=6379 --env MASTER=true --command -- redis-server /redis-master/redis.conf  > redis.yaml
     ```
     </p>
+    Edit the yaml to add volumes.
     <p>
 
     ```yaml
@@ -423,3 +424,76 @@
     ```
     </p>
     </details>
+
+6. Allocate resource limits and requests for the pod `redis` which was created in question 5. The resource limits and requests are `cpu: limit=1, request=200m, memory: limit=1Gi, request=300Mi`.
+
+    <details><summary>steps</summary>
+    <p>
+
+    ```bash
+    kubectl get pod redis -n redis -o yaml > redis.yaml
+    ```
+    </p>
+    Updated resources in the yaml.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: redis
+      namespace: redis
+      resourceVersion: "0"
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0.4
+        command:
+          - redis-server
+          - "/redis-master/redis.conf"
+        env:
+        - name: MASTER
+          value: "true"
+        ports:
+        - containerPort: 6379
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 300Mi
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+        - mountPath: /redis-master
+          name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: redis-config
+            items:
+            - key: redis-config
+              path: redis.conf
+    ```
+    </p>
+    <p>
+
+    ```bash
+    kubectl apply -f redis.yaml
+    ```
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    <p>
+
+    ```bash
+    kubectl get po redis -n redis -o jsonpath={.spec.containers[0].resources}
+    {"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":"200m","memory":"300Mi"}}
+    ```
+    </p>
+    </details>
+
