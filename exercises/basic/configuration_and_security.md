@@ -15,7 +15,6 @@
     <p>
 
     ```text
-    [05:49 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
     ┗━ ॐ  kd cm ckad-config-4d84kgcb4h
     Name:         ckad-config-4d84kgcb4h
     Namespace:    default
@@ -57,7 +56,6 @@
     <p>
 
     ```text
-    [05:55 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
     ┗━ ॐ  kubectl describe configmap/my-config
     Name:         my-config
     Namespace:    default
@@ -158,7 +156,6 @@
     <p>
 
     ```text
-    [06:16 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
     ┗━ ॐ  kubectl describe po mpod
     Name:         mpod
     Namespace:    default
@@ -243,7 +240,6 @@
     <p>
 
     ```bash
-    [06:20 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kubectl exec -it mpod -c busybox -- /bin/sh -c 'ls /etc/foo'
     key1  key2  key3
     ```
@@ -251,7 +247,6 @@
     <p>
 
     ```bash
-    [06:22 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kubectl exec -it mpod -c mpod -- /bin/sh -c 'env | grep -i key3'
     KEY3=value3
     ```
@@ -273,7 +268,6 @@
     <p>
 
     ```yaml
-    [06:30 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
     ┗━ ॐ  kubectl get cm envcm -o yaml -n denver
     apiVersion: v1
     data:
@@ -355,7 +349,6 @@
     <p>
 
     ```text
-    [06:53 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kubectl describe po -n redis
     Name:         redis
     Namespace:    redis
@@ -541,7 +534,6 @@
     <p>
 
     ```json
-    [08:21 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kg po -n denver -o json security-context-demo | jq '.spec.containers[]'
     {
       "command": [
@@ -668,7 +660,6 @@
     <p>
 
     ```json
-    [08:58 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kg po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
     {
       "image": "nginx:1.7.9",

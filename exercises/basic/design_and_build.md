@@ -162,7 +162,6 @@
     <p>
 
     ```text
-    [10:33 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
     ┗━ ॐ  kd job job-in-tokyo -n tokyo
     Name:             job-in-tokyo
     Namespace:        tokyo

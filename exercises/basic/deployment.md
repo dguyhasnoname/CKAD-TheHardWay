@@ -944,10 +944,8 @@
     <p>
 
     ```bash
-    [05:49 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
     ┗━ ॐ  kubectl set image deploy nginx-deployment nginx-deployment=nginx:1.16.4 -n denver
     deployment.apps/nginx-deployment image updated
-    [05:49 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
     ┗━ ॐ  kubectl rollout status deploy nginx-deployment -n denver
     Waiting for deployment "nginx-deployment" rollout to finish: 0 out of 3 new replicas have been updated...
     ```
@@ -977,7 +975,6 @@
     <p>
 
     ```bash
-    [05:55 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
     ┗━ ॐ  kubectl rollout resume deploy nginx-deployment -n denver
     deployment.apps/nginx-deployment resumed
     ```
@@ -987,7 +984,6 @@
     <p>
 
     ```bash
-    [06:00 PM IST 03.10.2021 ☸ 127.0.0.1:54146 📁  CKAD-TheHardWay ❱ master ▲]
     ┗━ ॐ      kubectl get po -n denver -l app=nginx-deployment -o jsonpath='{.items[*].spec.containers[?(@.name=="nginx-deployment")].image}'
     nginx:1.21.3 nginx:1.21.3 nginx:1.21.3
     ```
