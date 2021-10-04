@@ -11,7 +11,7 @@
     </p>
     </details>
 
-    <details><summary>result</summary>
+    <details><summary>verify</summary>
     <p>
 
     ```text
@@ -53,7 +53,7 @@
     </p>
     </details>
 
-    <details><summary>result</summary>
+    <details><summary>verify</summary>
     <p>
 
     ```text
@@ -154,7 +154,7 @@
     </p>
     </details>
 
-    <details><summary>result</summary>
+    <details><summary>verify</summary>
     <p>
 
     ```text
@@ -497,3 +497,236 @@
     </p>
     </details>
 
+7. Run pod named `security-context-pod` in namespace `denver` which should run with user id `1000` and group `3000`. Mount a `emptyDir` volume at location `/etc/sc` whose owner should be from group `2000`. Use `busybox` image to run command `sleep 1800`. The name of container should be `ckad` and it should not run in privilleged mode.
+
+    <details><summary>steps</summary>
+    Generate basic yaml for the pod.
+    <p>
+
+    ```bash
+    kubectl run security-context-pod -n denver --image=busybox --restart=Never --dry-run=client -o yaml > security-context-pod.yaml
+    ```
+    </p>
+    Edit the yaml to make changes.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: security-context-demo
+      namespace: denver
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      volumes:
+      - name: sec
+        emptyDir: {}
+      containers:
+      - name: ckad 
+        image: busybox
+        command: [ "sh", "-c", "sleep 1800" ]
+        volumeMounts:
+        - name: sec
+          mountPath: /etc/sc 
+        securityContext:
+          allowPrivilegeEscalation: false
+      ``` 
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    <p>
+
+    ```json
+    [08:21 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
+    ┗━ ॐ  kg po -n denver -o json security-context-demo | jq '.spec.containers[]'
+    {
+      "command": [
+        "sh",
+        "-c",
+        "sleep 1800"
+      ],
+      "image": "busybox",
+      "imagePullPolicy": "Always",
+      "name": "ckad",
+      "resources": {},
+      "securityContext": {
+        "allowPrivilegeEscalation": false
+      },
+      "terminationMessagePath": "/dev/termination-log",
+      "terminationMessagePolicy": "File",
+      "volumeMounts": [
+        {
+          "mountPath": "/etc/sc",
+          "name": "sec"
+        },
+        {
+          "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+          "name": "kube-api-access-dpzg2",
+          "readOnly": true
+        }
+      ]
+    }
+    ```
+    </p>
+    </details>
+
+8. Create a namepsace `tokyo` which allows to run max 10 pods. Run a deployment named `tokyo-deployment` which has a pod spec with `replicas` set to `12`. The pod spec should have `image` set to `nginx:1.7.9`. The container `tody` in pod should have capabilities `CAP_SYS_CHROOT` and `CAP_NET_ADMIN`. The container should not have the capability `SYS_TIME` and it should run in privileged mode. Check the events in namespace to see why all 12 pods are not running. Store the event logs in `tokyo-events.log`.
+
+    <details><summary>steps</summary>
+    Create the namespace.
+    <p>
+
+    ```bash
+    kubectl create ns tokyo
+    ```
+    </p>
+    Create the pod quota yaml for the namespace.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: pod-demo
+      namespace: tokyo
+    spec:
+      hard:
+        pods: "10"
+    ```
+    </p>
+    <p>
+
+    ```bash
+    kubectl apply -f pod-quota.yaml
+    ```
+    </p>
+    <p>
+    Generate basic yaml for the deployment.
+    <p>
+
+    ```bash
+    kubectl create deploy tokyo-deployment -n tokyo --image=nginx:1.7.9 --replicas=12 --dry-run=client -o yaml > tokyo-deployment.yaml
+    ```
+    </p>
+    Edit the yaml to make changes.
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: tokyo-deployment
+      name: tokyo-deployment
+      namespace: tokyo
+    spec:
+      replicas: 12
+      selector:
+        matchLabels:
+          app: tokyo-deployment
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: tokyo-deployment
+        spec:
+          containers:
+          - image: nginx:1.7.9
+            name: tody
+            resources: {}
+            securityContext:
+              capabilities:
+                add: ["CAP_SYS_CHROOT", "CAP_NET_ADMIN"]
+                drop: ["SYS_TIME"]
+              allowPrivilegeEscalation: true
+    ```
+    </p>
+    Apply the yaml to create the deployment.
+    <p>
+
+    ```bash
+    kubectl apply -f tokyo-deployment.yaml
+    ```
+    </p>
+    Store event logs in `tokyo-events.log`.
+    <p>
+
+    ```bash
+    kubectl get events -n tokyo > ./tokyo-events.log
+    ```
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    Verify container configuration.
+    <p>
+
+    ```json
+    [08:58 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ] 
+    ┗━ ॐ  kg po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
+    {
+      "image": "nginx:1.7.9",
+      "imagePullPolicy": "IfNotPresent",
+      "name": "tody",
+      "resources": {},
+      "securityContext": {
+        "allowPrivilegeEscalation": true,
+        "capabilities": {
+          "add": [
+            "CAP_SYS_CHROOT",
+            "CAP_NET_ADMIN"
+          ],
+          "drop": [
+            "SYS_TIME"
+          ]
+        }
+      },
+      "terminationMessagePath": "/dev/termination-log",
+      "terminationMessagePolicy": "File",
+      "volumeMounts": [
+        {
+          "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+          "name": "kube-api-access-x5ccj",
+          "readOnly": true
+        }
+      ]
+    }
+    ```
+    </p>
+    Verify the number of pods running.
+    <p>
+
+    ```bash
+    [08:50 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
+    ┗━ ॐ  kuebctl get po -n tokyo
+    NAME                                READY   STATUS    RESTARTS   AGE
+    tokyo-deployment-69c5cd57b6-4dw8h   1/1     Running   0          8s
+    tokyo-deployment-69c5cd57b6-bh4rn   1/1     Running   0          8s
+    tokyo-deployment-69c5cd57b6-gkqfm   1/1     Running   0          8s
+    tokyo-deployment-85d564b4b-49ckb    1/1     Running   0          8s
+    tokyo-deployment-85d564b4b-7h6rx    1/1     Running   0          8s
+    tokyo-deployment-85d564b4b-8db9l    1/1     Running   0          70s
+    tokyo-deployment-85d564b4b-lzl8t    1/1     Running   0          8s
+    tokyo-deployment-85d564b4b-mxm84    1/1     Running   0          8s
+    tokyo-deployment-85d564b4b-xvd69    1/1     Running   0          70s
+    tokyo-deployment-85d564b4b-asd12    1/1     Running   0          40s
+    ```
+    </p>
+    Verify event logs
+    <p>
+
+    ```bash
+    [08:50 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
+    ┗━ ॐ  kge -n tokyo
+    I1004 20:50:28.398799   58575 cert_rotation.go:137] Starting client certificate rotation controller
+    LAST SEEN   TYPE      REASON         OBJECT                                   MESSAGE
+    75s         Warning   FailedCreate   replicaset/tokyo-deployment-85d564b4b    Error creating: pods "tokyo-deployment-85d564b4b-5rhqd" is forbidden: exceeded quota: pod-demo, requested: pods=1, used: pods=2, limited: pods=2
+    ```
+    </p>
+    </details>
