@@ -534,7 +534,7 @@
     <p>
 
     ```json
-    ┗━ ॐ  kg po -n denver -o json security-context-demo | jq '.spec.containers[]'
+    ┗━ ॐ  kubectl po -n denver -o json security-context-demo | jq '.spec.containers[]'
     {
       "command": [
         "sh",
@@ -660,7 +660,7 @@
     <p>
 
     ```json
-    ┗━ ॐ  kg po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
+    ┗━ ॐ  kubectl po tokyo-deployment-69c5cd57b6-4dw8h -n tokyo -o json | jq '.spec.containers[]'
     {
       "image": "nginx:1.7.9",
       "imagePullPolicy": "IfNotPresent",
@@ -714,7 +714,7 @@
 
     ```bash
     [08:50 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
-    ┗━ ॐ  kge -n tokyo
+    ┗━ ॐ  kubectl get po -n tokyo
     I1004 20:50:28.398799   58575 cert_rotation.go:137] Starting client certificate rotation controller
     LAST SEEN   TYPE      REASON         OBJECT                                   MESSAGE
     75s         Warning   FailedCreate   replicaset/tokyo-deployment-85d564b4b    Error creating: pods "tokyo-deployment-85d564b4b-5rhqd" is forbidden: exceeded quota: pod-demo, requested: pods=1, used: pods=2, limited: pods=2
