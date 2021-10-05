@@ -196,7 +196,7 @@
 3. Team Paris needs a CronJob which will run every minute. Team paris do not own any namespace neither they want one. Please create a CrojJob for them which can be accessed by everyone who has read access to the cluster. The CronJob should run command `echo -n "Hello Paris : " && date && sleep 15`. Pods scheduled by the CronJob should have the label `id: paris-job` and image `busybox`. Configure the CronJob in such a way that if it runs late by more than 16 secs, it should be counted as failed. Limit the history of successfull runs to 2 and failed runs to 3.
 
     <details><summary>steps</summary>
-    Create basic job yaml.
+    Create basic cronjob yaml.
     <p>
 
     ```bash
