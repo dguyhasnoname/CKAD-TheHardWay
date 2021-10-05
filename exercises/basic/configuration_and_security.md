@@ -714,7 +714,7 @@
 
     ```bash
     [08:50 PM IST 04.10.2021 ☸ 127.0.0.1:57199 📁 ~ 𖦥 ]
-    ┗━ ॐ  kubectl get po -n tokyo
+    ┗━ ॐ  kubectl get events -n tokyo
     I1004 20:50:28.398799   58575 cert_rotation.go:137] Starting client certificate rotation controller
     LAST SEEN   TYPE      REASON         OBJECT                                   MESSAGE
     75s         Warning   FailedCreate   replicaset/tokyo-deployment-85d564b4b    Error creating: pods "tokyo-deployment-85d564b4b-5rhqd" is forbidden: exceeded quota: pod-demo, requested: pods=1, used: pods=2, limited: pods=2
