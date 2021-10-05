@@ -103,7 +103,149 @@
     </p>
     </details>
 
-2. Team Tokyo needs a Job in namespace `tokyo` . This Job `job-in-tokyo` should run image `busybox` and execute `sleep 5 && echo Hello Tokyo`. It should run a total of `5` times and should execute `3` runs in `parallel`. Pods in the job should have the label `id: tokyo-job`.
+2. Create a deployment `deploy-with-init` that spins up a single Pod with image `nginx:1.17.3-alpine` and serves files from a mounted volume at `/usr/share/nginx/html`, which is empty right now in namespace `lisbon`. Add an InitContainer named `myinit-con` which also mounts the same volume and creates a file `index.html` with content `Hello from Lisbon!` in the root dir of the mounted volume. The InitContainer should be using image `busybox`. Run a `curl` pod to check if the index.html is accessible. The `curl` pod shoudl use `nginx:alpine` image and it should cease to exist after the test.
+
+    <details><summary>steps</summary>
+    Genrate basic deployment yaml in the namespace `lisbon`.
+    <p>
+
+    ```bash
+    kubectl create deploy deploy-with-init --image=nginx:1.17.3-alpine --namespace=lisbon --dry-run=client -o yaml > deploy-with-init.yaml
+    ```
+    </p>
+    Edit yaml for the pod to add the init container and the volume mapping.
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: deploy-with-init
+      name: deploy-with-init
+      namespace: lisbon
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: deploy-with-init
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: deploy-with-init
+        spec:
+          initContainers:
+          - name: myinit-con
+            image: busybox
+            command:
+            - /bin/sh
+            - -c
+            - echo 'Hello from Lisbon!' > /tmp/foo/index.html
+            volumeMounts:
+            - name: vol
+              mountPath: /tmp/foo
+          containers:
+          - image: nginx:1.17.3-alpine
+            name: nginx
+            resources: {}
+            volumeMounts:
+            - name: vol
+              mountPath: /usr/share/nginx/html
+          volumes:
+          - name: vol
+            emptyDir: {}
+    ```
+    </p>
+    Apply the deploy-with-init.yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f deploy-with-init.yaml
+    ```
+    </p>
+    Get the pod IP of the pod run by deployment and then run curl pod to verify the index.html is accessible.
+    <p>
+
+    ```bash
+    kubectl run curl -it --rm --image=nginx:alpine --restart=Never -n lisbon -- /bin/sh -c 'curl -I http://172.17.0.6'
+    ```
+    </details>
+
+    <details><summary>verify</summary>
+    <p>
+
+    ```bash
+    [11:38 PM IST 05.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+    ┗━ ॐ  kubectl get po -n lisbon -o wide
+    NAME                               READY   STATUS    RESTARTS         AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+    deploy-with-init-b74c59b7d-h85dz   1/1     Running   0                2m18s   172.17.0.6    minikube   <none>           <none>
+    ```
+    </p>
+    Verify if init container was created and the index.html is written.
+    <p>
+
+    ```json
+    kubectl get po -n lisbon deploy-with-init-b74c59b7d-h85dz -o jsonpath-as-json={.spec.initContainers[*]}
+    [
+        {
+            "command": [
+                "/bin/sh",
+                "-c",
+                "echo 'Hello from Lisbon!' \u003e /tmp/foo/index.html"
+            ],
+            "image": "busybox",
+            "imagePullPolicy": "Always",
+            "name": "myinit-con",
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+                {
+                    "mountPath": "/tmp/foo",
+                    "name": "vol"
+                },
+                {
+                    "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                    "name": "kube-api-access-vgj9k",
+                    "readOnly": true
+                }
+            ]
+        }
+    ]
+    ```
+    </p>
+    Running the curl pod.
+    <p>
+
+    ```text
+    kubectl run curl -it --rm --image=nginx:alpine --restart=Never -n lisbon -- /bin/sh -c 'curl -I http://172.17.0.6'
+    HTTP/1.1 200 OK
+    Server: nginx/1.17.3
+    Date: Tue, 05 Oct 2021 18:09:26 GMT
+    Content-Type: text/html
+    Content-Length: 19
+    Last-Modified: Tue, 05 Oct 2021 18:06:39 GMT
+    Connection: keep-alive
+    ETag: "615c942f-13"
+    Accept-Ranges: bytes
+
+    pod "curl" deleted
+    ```
+    </p>
+    <p>
+
+    ```text
+    kubectl run curl -it --rm --image=nginx:alpine --restart=Never -n lisbon -- /bin/sh -c 'curl  http://172.17.0.6'
+    Hello from Lisbon!
+    pod "curl" deleted
+    ```
+    </p>
+    </details>
+
+3. Team Tokyo needs a Job in namespace `tokyo` . This Job `job-in-tokyo` should run image `busybox` and execute `sleep 5 && echo Hello Tokyo`. It should run a total of `5` times and should execute `3` runs in `parallel`. Pods in the job should have the label `id: tokyo-job`.
 
     <details><summary>steps</summary>
     Create basic job yaml.
@@ -193,7 +335,7 @@
     </p>
     </details>
 
-3. Team Paris needs a CronJob which will run every minute. Team paris do not own any namespace neither they want one. Please create a CrojJob for them which can be accessed by everyone who has read access to the cluster. The CronJob should run command `echo -n "Hello Paris : " && date && sleep 15`. Pods scheduled by the CronJob should have the label `id: paris-job` and image `busybox`. Configure the CronJob in such a way that if it runs late by more than 16 secs, it should be counted as failed. Limit the history of successfull runs to 2 and failed runs to 3.
+4. Team Paris needs a CronJob which will run every minute. Team paris do not own any namespace neither they want one. Please create a CrojJob for them which can be accessed by everyone who has read access to the cluster. The CronJob should run command `echo -n "Hello Paris : " && date && sleep 15`. Pods scheduled by the CronJob should have the label `id: paris-job` and image `busybox`. Configure the CronJob in such a way that if it runs late by more than 16 secs, it should be counted as failed. Limit the history of successfull runs to 2 and failed runs to 3.
 
     <details><summary>steps</summary>
     Create basic cronjob yaml.
@@ -265,3 +407,4 @@
     ```
     </p>
     <details>
+
