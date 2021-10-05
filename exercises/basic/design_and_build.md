@@ -192,3 +192,76 @@
     ```
     </p>
     </details>
+
+3. Team Paris needs a CronJob which will run every minute. Team paris do not own any namespace neither they want one. Please create a CrojJob for them which can be accessed by everyone who has read access to the cluster. The CronJob should run command `echo -n "Hello Paris : " && date && sleep 15`. Pods scheduled by the CronJob should have the label `id: paris-job` and image `busybox`. Configure the CronJob in such a way that if it runs late by more than 16 secs, it should be counted as failed. Limit the history of successfull runs to 2 and failed runs to 3.
+
+    <details><summary>steps</summary>
+    Create basic job yaml.
+    <p>
+
+    ```bash
+    kubectl create cronjob job-in-paris --image=busybox --schedule="0 * * * *" --dry-run=client -o yaml -- /bin/sh -c 'echo -n "Hello Paris : " && date && sleep 15' > cronjob-in-paris.yaml
+    ```
+    </p>
+    Modify job settings.
+    <p>
+
+    ```yaml
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: job-in-paris
+    spec:
+      startingDeadlineSeconds: 15
+      successfulJobsHistoryLimit: 2
+      failedJobsHistoryLimit: 3
+      jobTemplate:
+        metadata:
+          name: job-in-paris
+        spec:
+          template:
+            metadata:
+              labels:
+                id: paris-job
+            spec:
+              containers:
+              - command:
+                - /bin/sh
+                - -c
+                - 'echo -n "Hello Paris : " && date && sleep 15'
+                image: busybox
+                name: job-in-paris
+                resources: {}
+              restartPolicy: OnFailure
+      schedule: "*/1 * * * *"
+    ```
+    </p>
+    Apply the job yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f cronjob-in-paris.yaml
+    ```
+    </p>
+    </details>
+
+    <details><summary>result</summary>
+    <p>
+
+    ```bash
+    kubectl get cj
+    NAME           SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+    job-in-paris   */1 * * * *   False     0        36s             10m
+    ```
+    </p>
+    <p>
+
+    ```text
+    kubectl get po -l id=paris-job
+    NAME                             READY   STATUS      RESTARTS      AGE
+    job-in-paris-27224153--1-8dtvc   0/1     Completed   0             2m10s
+    job-in-paris-27224154--1-szkmp   0/1     Completed   0             70s
+    job-in-paris-27224155--1-6fm8r   1/1     Running     0             10s
+    ```
+    </p>
+    <details>
