@@ -408,3 +408,94 @@
     </p>
     <details>
 
+5. Create three different jobs names `apple`, `banana` and `cherry`. Create a single template file `job-template.yaml` to create all three jobs. Each of the jobs should run command `echo Processing {{ job-name }} && sleep 5`. Pass the job name as parameter to the command. The jobs should run in `default` namespace. Do not use helm in this case. Each job should have label `id: {{ job-name }}`.
+
+    <details><summary>steps</summary>
+    Create the template file using helm
+    <p>
+
+      ```yaml
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: $ITEM
+        labels:
+          id: $ITEM
+      spec:
+        template:
+          metadata:
+            name: jobexample
+            labels:
+              jobgroup: jobexample
+          spec:
+            containers:
+            - name: c
+              image: busybox
+              command: ["sh", "-c", "echo Processing item $ITEM && sleep 5"]
+            restartPolicy: Never
+      ```
+      </p>
+      Generate the job yaml files.
+      <p>
+
+      ```bash
+      mkdir ./jobs
+      for i in apple banana cherry
+      do
+        cat job-tmpl.yaml | sed "s/\$ITEM/$i/" > ./jobs/job-$i.yaml
+      done
+      ```
+      </p>
+      Check the job yaml files generated.
+      <p>
+
+      ```bash
+      ls ./jobs
+      job-apple.yaml
+      job-banana.yaml
+      job-cherry.yaml
+      ```
+      </p>
+      Apply the job yaml files.
+      <p>
+
+      ```bash
+      kubectl apply -f ./jobs
+      ```
+      </p>
+      </details>
+
+      <details><summary>verify</summary>
+      <p>
+
+      ```bash
+      [11:15 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  for i in apple banana cherry; do cat jobs.yaml | sed "s/\$ITEM/$i/" > ./jobs/job-$i.yaml; done
+      [11:15 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  ls ./jobs
+      job-apple.yaml	job-banana.yaml	job-cherry.yaml
+      ```
+      </p>
+
+      <p>
+
+      ```bash
+      [11:15 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kubectl apply -f ./jobs
+      job.batch/apple created
+      job.batch/banana created
+      job.batch/cherry created
+      ```
+      </p>
+      <p>
+
+      ```text
+      [11:16 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kubectl get po 
+      NAME                             READY   STATUS      RESTARTS      AGE
+      apple--1-rn87q                   0/1     Completed   0             27s
+      banana--1-smhmb                  0/1     Completed   0             27s
+      cherry--1-4vf4k                  0/1     Completed   0             27s
+      ```
+      </p>
+      </details>
