@@ -491,11 +491,20 @@
 
       ```text
       [11:16 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
-      ┗━ ॐ  kubectl get po 
+      ┗━ ॐ  kubectl get po
       NAME                             READY   STATUS      RESTARTS      AGE
       apple--1-rn87q                   0/1     Completed   0             27s
       banana--1-smhmb                  0/1     Completed   0             27s
       cherry--1-4vf4k                  0/1     Completed   0             27s
+      ```
+      </p>
+      Check logs for each job.
+      <p>
+
+      ```bash
+      [11:16 PM IST 06.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kubectl logs banana--1-smhmb
+      Processing item banana
       ```
       </p>
       </details>
