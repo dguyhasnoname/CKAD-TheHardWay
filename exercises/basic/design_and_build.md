@@ -692,3 +692,150 @@
       ```
       </p>
       </details>
+
+8. Create a deployment as mentioned in yaml file below. Create a sidecar container named `logging` , image `busybox`, which mounts the same volume as that of deployment and writes the content of `golfer.log` in such a way that it is accessible by `kubectl logs` command. Check the logs of `logging` container.
+
+    <details><summary>deployment.yaml</summary>
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        id: golfer
+      name: golfer
+      namespace: denver
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          id: golfer
+      template:
+        metadata:
+          labels:
+            id: golfer
+        spec:
+          volumes:
+            - name: logs
+              emptyDir: {}
+          initContainers:
+          - name: init
+            image: busybox
+            command: ['/bin/sh', '-c', 'echo init > /var/log/golfer/golfer.log']
+            volumeMounts:
+            - name: logs
+              mountPath: /var/log/golfer
+          containers:
+          - name: busy-golfer
+            image: busybox
+            command: ['/bin/sh', '-c', 'while true; do echo `date`: "removing data file of players" >> /var/log/golfer/golfer.log; sleep 1; done']
+            volumeMounts:
+            - name: logs
+              mountPath: /var/log/golfer
+            resources: {}
+    ```
+    </p>
+    </details>
+
+    <details><summary>steps</summary>
+    First deploy the above deployment.ymla. Add then add logging container configuration to the yaml.
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        id: golfer
+      name: golfer
+      namespace: denver
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          id: golfer
+      template:
+        metadata:
+          labels:
+            id: golfer
+        spec:
+          volumes:
+            - name: logs
+              emptyDir: {}
+          initContainers:
+          - name: init
+            image: busybox
+            command: ['/bin/sh', '-c', 'echo init > /var/log/golfer/golfer.log']
+            volumeMounts:
+            - name: logs
+              mountPath: /var/log/golfer
+          containers:
+          - name: busy-golfer
+            image: busybox
+            command: ['/bin/sh', '-c', 'while true; do echo `date`: "removing data file of players" >> /var/log/golfer/golfer.log; sleep 1; done']
+            volumeMounts:
+            - name: logs
+              mountPath: /var/log/golfer
+            resources: {}
+          - name: logging
+            image: busybox
+            command: ["/bin/sh", "-c", "tail -f /var/log/golfer/golfer.log"]
+            volumeMounts:
+            - name: logs
+              mountPath: /var/log/golfer
+            resources: {}
+      ```
+      </p>
+      Apply the changes.
+      <p>
+
+      ```bash
+      kubectl apply -f deployment.yaml
+      ```
+      </p>
+      List the pods and then check the logs of logging container.
+
+      ```bash
+      kubectl logs golfer-685548d5c9-p5mq9 -n denver -c logging
+      ```
+      </p>
+      </details>
+
+      <details><summary>verify</summary>
+      <p>
+
+      ```bash
+      [10:53 AM IST 07.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kubectl apply -f golfer.yaml
+      deployment.apps/golfer configured
+      ```
+      </p>
+      Check the deployment pods.
+      <p>
+
+      ```bash
+      [10:53 AM IST 07.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kg deploy,po -n denver
+      NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+      deployment.apps/golfer   2/2     2            2           6m27s
+
+      NAME                          READY   STATUS    RESTARTS       AGE
+      pod/golfer-685548d5c9-p5mq9   2/2     Running   0              58s
+      pod/golfer-685548d5c9-snxmt   2/2     Running   0              74s
+      ```
+      </p>
+      Check logs.
+      <p>
+
+      ```bash
+      [10:55 AM IST 07.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲]
+      ┗━ ॐ  kubectl logs golfer-685548d5c9-p5mq9 -n denver -c logging
+      init
+      Thu Oct 7 05:24:15 UTC 2021: removing data file of players
+      Thu Oct 7 05:24:16 UTC 2021: removing data file of players
+      Thu Oct 7 05:24:17 UTC 2021: removing data file of players
+      Thu Oct 7 05:24:18 UTC 2021: removing data file of players
+      ```
+      </p>
+      </details>
