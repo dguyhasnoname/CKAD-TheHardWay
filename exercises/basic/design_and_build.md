@@ -623,3 +623,72 @@
 
       </p>
       </details>
+
+7. Create a `PersistentVolume` named `persuit-of-persistence` with storage of `3Gi`. The volumeMode should not be `Block` type. Reclaim policy should be `Recycle` with access mode set in a way so that the volume can be mounted as `read-only by many nodes`. The storage class for the PV is `persuit` with `Retain` reclaim policy. PV should mount `/mnt/data` on the k8s host.
+
+    <details><summary>steps</summary>
+    Create the storage class persuit-sc.yaml
+    <p>
+
+    ```yaml
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: persuit
+    provisioner: k8s.io/minikube-hostpath # this is for minikube clusters. Use appropriate provisioner if working on other clusters.
+    reclaimPolicy: Retain
+    allowVolumeExpansion: true
+    ```
+    </p>
+    Create the persistent volume persuit-of-persistence.yaml file.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: persuit-of-persistence
+    spec:
+      storageClassName: persuit
+      capacity:
+        storage: 3Gi
+      accessModes:
+        - ReadOnlyMany
+      persistentVolumeReclaimPolicy: Recycle
+      volumeMode: Filesystem
+      hostPath:
+        path: /mnt/data
+      ```
+
+      </p>
+      Create the storage class.
+      <p>
+
+      ```bash
+      kubectl apply -f persuit-sc.yaml
+      ```
+      </p>
+      Apply the PV yaml file.
+      <p>
+
+      ```bash
+      kubectl apply -f  persuit-of-persistence.yaml
+      ```
+      </p>
+
+      </details>
+
+      <details><summary>verify</summary>
+      <p>
+
+      ```bash
+      [10:33 AM IST 07.10.2021 ☸ 127.0.0.1:51368 📁 CKAD-TheHardWay ❱ master ▲] 
+      ┗━ ॐ  kubectl get sc,pv
+      NAME                                             PROVISIONER                RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+      storageclass.storage.k8s.io/persuit              k8s.io/minikube-hostpath   Retain          Immediate           true                   6m50s
+
+      NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                   STORAGECLASS   REASON   AGE
+      persistentvolume/persuit-of-persistence                     3Gi        ROX            Recycle          Available                           persuit                 43s
+      ```
+      </p>
+      </details>
