@@ -353,7 +353,7 @@
     </p>
     </details>
 
-4. Create a CrojJob `vibrant-tokyo` in namespace `tokyo`. It should run `every minute` with a restartPolciy of `OnFailure`. It should print `date; Welcome to vibrant Tokyo!` with image `busybox`. The pod image should be pulled only when it is not present on the kubernetes node where it is scheduled. The pods should have the label `id: vibrant-tokyo`.
+4. Create a CronJob `vibrant-tokyo` in namespace `tokyo`. It should run `every minute` with a restartPolicy of `OnFailure`. It should run commands `date; Welcome to vibrant Tokyo!` with image `busybox`. The pod image should be pulled only when it is not present on the kubernetes node where it is scheduled. The pods should have the label `id: vibrant-tokyo`.
 
     <details><summary>steps</summary>
     Create basic job yaml in tokyo namespace.
