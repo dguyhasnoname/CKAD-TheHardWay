@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness-pod
+  name: liveness-pod
+spec:
+  containers:
+  - name: liveness-pod
+    image: k8s.gcr.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/healthy; sleep 30; echo Host name is $HOSTNAME; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/health
+      initialDelaySeconds: 10
+      periodSeconds: 5
