@@ -459,4 +459,84 @@
     </p>
     </details>
 
+5. `Jasmine` is a new kubernetes developer and she is trying to configure a deployment in default namespace. She is facing some issue and not able to create the deployment successfully. She is using  deployment file stored at:
+
+    ```
+    https://raw.githubusercontent.com/dguyhasnoname/CKAD-TheHardWay/master/lab-setup/manifests/basic/om-deployment-5.yaml
+    ```
+
+    Please identify the issue with the deployment yaml. Once issue is identified, updated the deployment yaml and apply the updated yaml. Verify the pods are running.
+
+    <details><summary>steps</summary>
+    Try running the deployment yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f https://raw.githubusercontent.com/dguyhasnoname/CKAD-TheHardWay/master/lab-setup/manifests/basic/om-deployment-5.yaml
+    error: unable to recognize "https://raw.githubusercontent.com/dguyhasnoname/CKAD-TheHardWay/master/lab-setup/manifests/basic/om-deployment-5.yaml": no matches for kind "Deployment" in version "apps/v1beta2"
+    ```
+    </p>
+    Deprecated api Version is being used in the deployment yaml. Find the supported api version and update it.
+    <p>
+
+    ```bash
+    kubectl api-resources --api-group apps | grep deployments
+    ```
+    </p>
+    Update the deployment yaml.
+    <p>
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: nginx-deployment-5
+    spec:
+      selector:
+        matchLabels:
+          app: nginx
+      replicas: 2
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          containers:
+          - name: nginx-5
+            image: nginx:1.14.2
+            ports:
+            - containerPort: 80
+    ```
+    </p>
+    Apply the updated yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f om-deployment-5.yaml
+    ```
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    Check the status of deployment.
+    <p>
+
+
+    ```bash
+    [08:15 PM IST 16.10.2021 ☸ 127.0.0.1:59140 📁 ~ 𖦥 ] 
+    ┗━ ॐ  kg po
+    NAME                                 READY   STATUS             RESTARTS         AGE
+    nginx-deployment-5-f786fd499-csprl   1/1     Running            0                34s
+    nginx-deployment-5-f786fd499-nfnhb   1/1     Running            0                34s
+    ```
+    </p>
+
+    </details>
+
+
+
+
+
+
+
 
