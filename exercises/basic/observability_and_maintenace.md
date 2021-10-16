@@ -366,8 +366,97 @@
     liveness-probe-3   1/1     Running            0               34s
     ```
     </p>
-    <details><summary>next steps</summary>
+    </details>
 
+4. Delete the `liveness-probe-3` pod deployed in question 3. Configure the liveness probe as a result of which, the probe at a time should retry only `once` before giving up. Update the `periodSeconds` to `3s` and probe should timeout to `1s`. Set the `terminationGracePeriodSeconds` to `6s`. Check the events only of `liveness-probe-3` pod and store only the warnings in `error.log`.
 
+    <details><summary>steps</summary>
+    Delete the pod.
+    <p>
+
+    ```bash
+    kubectl delete po liveness-probe-3
+    ```
+    <p>
+
+    Configure the liveness probe to use failureThreshold as `5`.
+    <p>
+
+    ```yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        test: liveness-probe-3
+      name: liveness-probe-3
+    spec:
+      containers:
+      - name: liveness-probe-3
+        image: k8s.gcr.io/busybox
+        args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy; sleep 30; echo $HOSTNAME; sleep 600
+        resources: {}
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/heal
+          initialDelaySeconds: 5
+          periodSeconds: 3
+          timeoutSeconds: 1
+          failureThreshold: 1
+          terminationGracePeriodSeconds: 6
+    ```
+    </p>
+    Apply the updated yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f liveness-probe-3.yaml
+    ```
+    </p>
+    Store the events in error.log after checking the events.
+    <p>
+
+    ```bash
+    kubectl get events --field-selector type==Warning,involvedObject.name=liveness-probe-3 > error.log
+    ```
+    </p>
+
+    </details>
+
+    <details><summary>verify</summary>
+    Check the status of pod again..
+    <p>
+
+    ```text
+    [07:23 PM IST 16.10.2021 ☸ 127.0.0.1:59140 📁 ~ 𖦥 ]
+    ┗━ ॐ  kg po
+    NAME               READY   STATUS             RESTARTS         AGE
+    liveness-probe-3   1/1     Running            6 (32s ago)    5m8s
+    ```
+    </p>
+    Check events for the pod.
+    <p>
+
+    ```bash
+    kubectl get events --field-selector type==Warning,involvedObject.name=liveness-probe-3 
+
+    LAST SEEN   TYPE      REASON          OBJECT                 MESSAGE
+    59m         Warning   Unhealthy       pod/liveness-probe-3   Liveness probe failed: cat: can't open '/tmp/heal': No such file or directory
+    56m         Warning   BackOff         pod/liveness-probe-3   Back-off restarting failed container
+    39m         Warning   FailedKillPod   pod/liveness-probe-3   error killing pod: failed to "KillContainer" for "liveness-probe-3" with KillContainerError: "rpc error: code = Unknown desc = Error response from daemon: No such container: 1169a57854a73d64c83f5383e8ef3506ea9605b11bd6e3bd9d1323b1badf6b78"
+    37m         Warning   Unhealthy       pod/liveness-probe-3   Liveness probe failed: cat: can't open '/tmp/heal': No such file or directory
+    27m         Warning   BackOff         pod/liveness-probe-3   Back-off restarting failed container
+    21m         Warning   Unhealthy       pod/liveness-probe-3   Liveness probe failed: cat: can't open '/tmp/heal': No such file or directory
+    17m         Warning   BackOff         pod/liveness-probe-3   Back-off restarting failed container
+    15m         Warning   Unhealthy       pod/liveness-probe-3   Liveness probe failed: cat: can't open '/tmp/heal': No such file or directory
+    9m22s       Warning   Unhealthy       pod/liveness-probe-3   Liveness probe failed: cat: can't open '/tmp/heal': No such file or directory
+    81s         Warning   BackOff         pod/liveness-probe-3   Back-off restarting failed container
+    ```
+    </p>
+    </details>
 
 
