@@ -16,7 +16,7 @@
     kubectl expose deployment nginx --port=80
     ```
     </p>
-    Create the network policy in default namespace.
+    Create the network policy in default namespace. Save this config in netpol.yaml file.
     <p>
 
     ```yaml
@@ -35,6 +35,13 @@
               access: "true"
     ```
     </p>
+    Apply above network policy.
+    <p>
+
+    ```bash
+    kubectl apply -f netpol.yaml
+    ```
+    </p>
     Launch a busybox pod and try to access the service.
     <p>
 
@@ -42,6 +49,7 @@
     kubectl run busybox --rm -ti --image=busybox -- /bin/sh
     ```
     </p>
+    Command to access the servie.
     <p>
 
     ```bash
@@ -93,13 +101,14 @@
 
     <details><summary>steps</summary>
 
-    Create the pod with appropriate labels.
+    Create the pod with appropriate labels and then run the command to access the service.
     <p>
 
     ```bash
     kubectl run busybox --rm -ti --labels="access=true" --image=busybox -- /bin/sh
     ```
     </p>
+    Command to access the service.
     <p>
 
     ```bash
