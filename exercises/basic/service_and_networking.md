@@ -133,7 +133,13 @@
     </p>
     </details>
 
+3. Run below command:
 
+    ```
+    kubectl apply -f https://raw.githubusercontent.com/dguyhasnoname/CKAD-TheHardWay/master/lab-setup/manifests/basic/sn-ns-netpol-3.yaml
+    ```
+
+    Above command creates 3 namespaces `manila`, `jakarta` and `seoul`. A nginx deployment gets created in `manila` namespace. Expose the deployment `nginx` in `manila` namespace on port `80`. Create a network policy so that pods running only in `jakarta` and `seoul` namespace can access the `nginx` deployment pods running in `manila` namespace. Verify the accessibility by running pods in `jakarta` and `seoul` namespaces. Also ensure that any pod running in `default` namespace is not able to access the `nginx` service in `manila` namespace.
 
 
 
