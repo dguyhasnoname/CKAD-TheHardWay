@@ -2,7 +2,7 @@
 
 1. Create multi-container pod `two-containers` in `default` namespace. The first container should run `nginx` image and voume mounted at `/usr/share/nginx/html` directory. The second container should run `busybox` image and volume mounted at `/data` directory. The `busybox` container should run command `echo Hello from the debian container > /data/index.html`.  The content written by `busybox` container should be visible in the `nginx` container. Run an extra container in the pod which can let us see the content of `/usr/share/nginx/html/index.html` from `kubectl logs command`. Verify the logs of the third container.
 
-    <details><summary>verify</summary>
+    <details><summary>solution</summary>
     Pod two-containers yaml:
     <p>
 
