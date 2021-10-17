@@ -12,28 +12,23 @@
     metadata:
       name: two-containers
     spec:
-
       restartPolicy: Never
-
       volumes:
       - name: shared-data
         emptyDir: {}
-
       containers:
-
       - name: nginx-container
         image: nginx
         volumeMounts:
         - name: shared-data
           mountPath: /usr/share/nginx/html
-
-      - name: debian-container
-        image: debian
+      - name: busybox-container
+        image: busybox
         volumeMounts:
         - name: shared-data
-          mountPath: /pod-data
+          mountPath: /data
         command: ["/bin/sh"]
-        args: ["-c", "echo Hello from the debian container > /pod-data/index.html"]
+        args: ["-c", "echo Hello from the busybox container > /data/index.html"]
     ```
     </p>
     <p>
