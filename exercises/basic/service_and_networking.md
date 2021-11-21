@@ -141,7 +141,7 @@
 
     Above command creates 3 namespaces `manila`, `jakarta` and `seoul`. A nginx deployment gets created in `manila` namespace. Expose the deployment `nginx` in `manila` namespace on port `80`. Create a network policy so that pods running only in `jakarta` and `seoul` namespace can access the `nginx` deployment pods running in `manila` namespace. Verify the accessibility by running pods in `jakarta` and `seoul` namespaces. Also ensure that any pod running in `default` namespace is not able to access the `nginx` service in `manila` namespace.
 
-4. Run a pod with name `apiserver` in default namespace, marked with labels `app=bookstore` and `role=api`. Create a netpol to restrict the access only to other pods (e.g. other microservices) running with label `app=bookstore`.
+4. Run a pod with name `apiserver` in default namespace, marked with labels `app=bookstore` and `role=api`. Expose it on port `80`. Create a netpol to restrict the access only to other pods (e.g. other microservices) running with label `app=bookstore`.
 
     <details><summary>steps</summary>
     Create a pod with name apiserver in default namespace, marked with labels app=bookstore and role=api.
@@ -207,3 +207,80 @@
     </details>
 
 
+5. Run a pod named `web` in default ns with image `nginx` with label `app=web` and expose it on port `80`. Create two namespaces `dev` and `prod` with labels `purpose=testing` and `purpose=production`. Create a netpol to restrict the access to pod `web` for pods only running in `dev` namespace. The netpol should only allow traffic form pods running in namespace with label `purpose=production`.
+
+    <details><summary>steps</summary>
+    Create a pod with name web in default ns, image nginx, label app=web and expose it on port 80.
+    <p>
+
+    ```bash
+    kubectl run web --image=nginx --labels=app=web --expose --port 80
+
+    ```
+    </p>
+    Create two namespaces dev and prod with labels purpose=testing and purpose=production.
+    <p>
+
+    ```bash
+    kubectl create ns dev --labels purpose=testing
+    kubectl create ns prod --labels purpose=production
+    ```
+    </p>
+    Create a netpol to restrict the access only to pods running in dev namespace.
+    <p>
+
+    ```yaml
+    kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: web-allow-prod
+    spec:
+      podSelector:
+        matchLabels:
+          app: web
+      ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              purpose: production
+    ```
+    </p>
+    Apply the netpol yaml.
+    <p>
+
+    ```bash
+    kubectl apply -f web-allow-prod.yaml
+    ```
+
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    Test the Network Policy is blocking the traffic, by running a Pod in dev namespace:
+
+    <p>
+
+    ```bash
+    $ kubectl run test-1 --namespace=dev --rm -i -t --image=alpine -- sh
+    If you don't see a command prompt, try pressing enter.
+    / # wget -qO- --timeout=2 http://web.default
+    wget: download timed out
+
+    ```
+    </p>
+
+    Test the Network Policy is allowing the traffic, by running a Pod in prod namespace:
+
+    <p>
+
+    ```bash
+    $ kubectl run test-2 --namespace=prod --rm -i -t --image=alpine -- sh
+    If you don't see a command prompt, try pressing enter.
+    / # wget -qO- --timeout=2 http://web.default
+    <!DOCTYPE html>
+    <html>
+    <head>
+    ...
+    ```
+    </p>
+    </details>
