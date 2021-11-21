@@ -284,3 +284,76 @@
     ```
     </p>
     </details>
+
+6. Create a netpol which has a combined NetworkPolicy that has the list of microservices that are allowed to connect to an application which. It should allow ingress from workloads with labels `role=search`, `role=api` and `role=web` irrespective of the namespaces in which the workloads are running.
+
+    <details><summary>steps</summary>
+
+    Create the netpol.
+    <p>
+
+    ```yaml
+    kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: redis-allow-services
+    spec:
+      podSelector:
+        matchLabels:
+          app: bookstore
+          role: db
+      ingress:
+      - from:
+        - podSelector:
+            matchLabels:
+              app: bookstore
+              role: search
+        - podSelector:
+            matchLabels:
+              app: bookstore
+              role: api
+        - podSelector:
+            matchLabels:
+              app: inventory
+              role: web
+    ```
+
+    Apply the netpol yaml.
+    <p>
+
+    ```bash
+    $ kubectl apply -f redis-allow-services.yaml
+    ```
+    </p>
+
+    </details>
+
+    <details><summary>verify</summary>
+
+    Test the Network Policy is allowing the traffic, by running a Pod in default namespace:
+
+    <p>
+
+    ```bash
+    $ kubectl run test-3 --labels=app=inventory,role=web --rm -i -t --image=alpine -- sh
+
+    / # nc -v -w 2 db 6379
+    db (10.59.242.200:6379) open
+    ```
+    </p>
+    Pods with labels not matching will not be able to connect
+    <p>
+
+    ```bash
+    $ kubectl run test-4 --labels=app=other --rm -i -t --image=alpine -- sh
+
+    / # nc -v -w 2 db 6379
+    nc: db (10.59.252.83:6379): Operation timed out
+
+    ```
+    </p>
+    </details>
+
+
+
+
