@@ -141,7 +141,69 @@
 
     Above command creates 3 namespaces `manila`, `jakarta` and `seoul`. A nginx deployment gets created in `manila` namespace. Expose the deployment `nginx` in `manila` namespace on port `80`. Create a network policy so that pods running only in `jakarta` and `seoul` namespace can access the `nginx` deployment pods running in `manila` namespace. Verify the accessibility by running pods in `jakarta` and `seoul` namespaces. Also ensure that any pod running in `default` namespace is not able to access the `nginx` service in `manila` namespace.
 
+4. Run a pod with name `apiserver` in default namespace, marked with labels `app=bookstore` and `role=api`. Create a netpol to restrict the access only to other pods (e.g. other microservices) running with label `app=bookstore`.
+
+    <details><summary>steps</summary>
+    Create a pod with name apiserver in default namespace, marked with labels app=bookstore and role=api.
+    <p>
+
+    ```bash
+    kubectl run apiserver --image=nginx --labels app=bookstore,role=api --expose --port 80
+
+    ```
+    </p>
+    Create a netpol to restrict the access only to other pods (e.g. other microservices) running with label app=bookstore.
+    <p>
+
+    ```yaml
+    kind: NetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    metadata:
+      name: api-allow
+    spec:
+      podSelector:
+        matchLabels:
+          app: bookstore
+          role: api
+      ingress:
+      - from:
+          - podSelector:
+              matchLabels:
+                app: bookstore
+    ```
+    </p>
+    Apply the netpol yaml.
+    <p>
 
 
+    ```bash
+    kubectl apply -f api-allow.yaml
+    ```
+    </p>
+    </details>
+
+    <details><summary>verify</summary>
+    Test the Network Policy is blocking the traffic, by running a Pod without the app=bookstore label:
+    <p>
+
+    ```bash
+    $ kubectl run test-$RANDOM --rm -i -t --image=alpine -- sh
+    / # wget -qO- --timeout=2 http://apiserver
+    wget: download timed out
+    ```
+    </p>
+
+    Test the Network Policy is allowing the traffic, by running a Pod with the app=bookstore label:
+
+    <p>
+
+    ```bash
+    $ kubectl run test-$RANDOM --rm -i -t --image=alpine --labels app=bookstore,role=frontend -- sh
+    / # wget -qO- --timeout=2 http://apiserver
+    <!DOCTYPE html>
+    <html><head>
+    ```
+    </p>
+    </details>
 
 
