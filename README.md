@@ -80,9 +80,9 @@ CKAD Curriculum: [link](https://github.com/cncf/curriculum)
 
 3. kubeconfig of your k8s cluster
 
-Once you have working k8s cluster, please get the kubeconfig for the cluster which have appropriate rights.
+Once you have working k8s cluster, please get the kubeconfig for the cluster which have appropriate rights. If you are using minikube, the default kubeconfig will be picked automatically.
 
-### Setting up the lab
+### Setting up the lab (under development)
 
     kubectl apply -f lab_setup.yaml
 
@@ -92,7 +92,7 @@ Running above command should setup the lab in your cluster.
 
 1. Tune your vim editor skills
 
-    - Create the file ~/.vimrc with the following content:
+    - Create/update the file ~/.vimrc with the following content:
 
         ```
         set tabstop=2       # tab width to 2 spaces
@@ -112,6 +112,7 @@ Running above command should setup the lab in your cluster.
         3. To indent press `>`(shift + .).
 
         You can then repeat the indentation by using the `>` key. This can be useful when we copy yamls from kuberntes documentations.
+
     - Other vim shortcuts:
 
         ```text
@@ -142,6 +143,8 @@ Running above command should setup the lab in your cluster.
 
 2. Setup your aliases
 
+    Use below aliases save time in typing:
+
     ```bash
     alias 'kg=kubectl get'
     alias 'kd=kubectl describe'
@@ -165,10 +168,16 @@ Running above command should setup the lab in your cluster.
 
 3. Try to use imperative kubectl commands to create resources yaml. You can use `kubectl get` to get the list of resources.
 
+4. Use the bookmarks for k8s documentation to jump to the desired section. CKA, CKAD and CKS exams let you use the official documentation. Only tab is allowed to be opened at a time.
+
+    - [Bookmark I used to pass CKAD and CKAD](./cka_ckad_bookmarks.html)
+
+    You can create your own bookmarks to be more comfortable. Try creating a bookmark for each type of example so that it can be accessed during exam quickly.
+
 ## PRs
 
 Feel free to PR and edit/add questions and solutions, but please follow to the existing format and make sure you have tested your changes before submitting a PR.
 
-If CKAD-TheHardWay repo has helped you in any way learning Kubernetes, feel free to post on discussions, share across your blogs or buy me a coffee!
+If CKAD-TheHardWay repo has helped you in any way learning Kubernetes, feel free to post on discussions, star it, fork it and share across your blogs or buy me a coffee!
 
 <a href="https://buymeacoffee.com/dguyhasnoname" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
