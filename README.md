@@ -170,7 +170,7 @@ Running above command should setup the lab in your cluster.
 
 4. Use the bookmarks for k8s documentation to jump to the desired section. CKA, CKAD and CKS exams let you use the official documentation. Only tab is allowed to be opened at a time.
 
-    - [Bookmark I used to pass CKAD and CKAD](./cka_ckad_bookmarks.html)
+    - [Bookmark I used to pass CKAD and CKA](./cka_ckad_bookmarks.html)
 
     You can create your own bookmarks to be more comfortable. Try creating a bookmark for each type of example so that it can be accessed during exam quickly.
 
