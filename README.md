@@ -1,5 +1,7 @@
 # CKAD-TheHardWay [under development]
 
+<img src="./logo.png" align="right" width="300px"/>
+
 CKAD exercises in this repo are of two different difficulty levels:
 
 1. [basic](./exercises/basic/about.md)
