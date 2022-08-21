@@ -99,7 +99,7 @@ Running above command should setup the lab in your cluster.
         ```
         set tabstop=2       # tab width to 2 spaces
         set expandtab       # expand tabs to spaces
-        set shiftwidth=2:   # columns of whitespace for indentation
+        set shiftwidth=2   # columns of whitespace for indentation
         ```
 
         Since this is going to save time in indentation and help create error free yamls, here is a tip to remember the setting:
