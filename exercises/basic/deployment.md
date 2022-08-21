@@ -453,9 +453,10 @@
 
     <details><summary>steps</summary>
     <p>
+        
     ```bash
     kubectl expose deployment game -n denver --port=4444 --target-port=80 --type=ClusterIP --name=games
-    ```
+    ```  
     </p>
     </details>
 
@@ -498,9 +499,10 @@
 
     <details><summary>steps</summary>
     <p>
+        
     ```bash
     kubectl expose deployment game -n denver --port=3333 --target-port=80 --type=NodePort --name=game
-    ```
+    ```  
     </p>
     </details>
 
