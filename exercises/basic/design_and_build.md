@@ -444,7 +444,7 @@
     <p>
 
     ```bash
-    kubectl create cronjob job-in-paris --image=busybox --schedule="0 * * * *" --dry-run=client -o yaml -- /bin/sh -c 'echo -n "Hello Paris : " && date && sleep 15' > cronjob-in-paris.yaml
+    kubectl create cronjob job-in-paris --image=busybox --schedule="*/1 * * * *" --dry-run=client -o yaml -- /bin/sh -c 'echo -n "Hello Paris : " && date && sleep 15' > cronjob-in-paris.yaml
     ```
 
     </p>
