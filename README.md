@@ -11,7 +11,7 @@ CKAD Curriculum: [link](https://github.com/cncf/curriculum)
 
 ## Contents:
 
-1. Application desgin and build - 20%
+1. Application design and build - 20%
     <details><summary>details</summary>
     <p>
 
