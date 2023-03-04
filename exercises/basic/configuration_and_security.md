@@ -41,7 +41,7 @@
     </p>
     </details>
 
-2. Create a new config map named `my-config` with specified keys instead of file basenames on disk. The values are the same as the ones in the `my-config` configmap with each of the key being stored in key1.txt, key2.txt and key3.txt respectively.
+2. Create a new config map named `my-config` with specified keys instead of file basenames on disk. The values are the same as the ones in the `ckad-config` configmap with each of the key being stored in key1.txt, key2.txt and key3.txt respectively.
 
     <details><summary>steps</summary>
     <p>
