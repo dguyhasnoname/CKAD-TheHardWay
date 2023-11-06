@@ -328,24 +328,24 @@
     namespace: exercise
     spec:
       replicas: 2
-    selector:
-      matchLabels:
-        app: running-daily
-    strategy: {}
-    template:
-      metadata:
-        creationTimestamp: null
-        labels:
+      selector:
+        matchLabels:
           app: running-daily
-      spec:
-        containers:
-        - command:
-          - /bin/sh
-          - -c
-          - echo "Hello from running"
-          image: alpine:latest
-          name: running-daily
-          resources: {}
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: running-daily
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - echo "Hello from running"
+            image: alpine:latest
+            name: running-daily
+            resources: {}
     status: {}
     ```
     </details>
