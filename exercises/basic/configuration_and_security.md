@@ -122,10 +122,10 @@
             configMapKeyRef:                              # add the configMapKeyRef for ckad-config cm
               name: ckad-config-4d84kgcb4h
               key: key3
-    volumes:
-    - name: vol1
-      configMap:
-        name: my-config
+      volumes:
+      - name: vol1
+        configMap:
+          name: my-config
     dnsPolicy: ClusterFirst
     restartPolicy: Never
     status: {}
